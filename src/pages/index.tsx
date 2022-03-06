@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import type { ImageLoaderProps } from 'next/image';
 import type { NextPage } from 'next';
-import moment from 'moment';
 import { Table } from 'antd';
 import request from '@/services';
 import { useMount, useSetState } from 'react-use';
@@ -9,7 +8,7 @@ import { useMount, useSetState } from 'react-use';
 import { useRequest } from '@/utils/hooks';
 import styles from './index.module.css';
 
-const { getJuejinList } = request;
+const { getJuejinList, getNewsList } = request;
 
 const myLoader = ({ src, width, quality }: ImageLoaderProps) => {
   return `${src}?w=${width}&q=${quality || 75}`
@@ -39,6 +38,10 @@ const Home: NextPage = () => {
       category_id: '',
       cursor: 0,
       limit: state.pageSize
+    });
+
+    getNewsList().then(res => {
+      console.log(res);
     });
   });
 
