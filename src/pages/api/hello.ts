@@ -17,23 +17,19 @@ export default function handler(
   res: NextApiResponse<Data>
 ) {
   const { body } = req;
-  const timer = setTimeout(() => {
-    const list = new Array(body.pageSize).fill(true).map((item, index) => {
-      const id = index + 1 + (body.current - 1) * body.pageSize;
-      return {
-        jobName: `测试名称${id}`,
-        createTime: Date.now(),
-        id,
-      };
-    });
-    res.status(200).send({
-      total: 1000,
-      pageSize: body.pageSize,
-      current: body.current,
-      list,
-    })
+  const list = new Array(body.pageSize).fill(true).map((item, index) => {
+    const id = index + 1 + (body.current - 1) * body.pageSize;
+    return {
+      jobName: `测试名称${id}`,
+      createTime: Date.now(),
+      id,
+    };
+  });
 
-    clearTimeout(timer);
-  }, 1000);
-
+  res.status(200).send({
+    total: 1000,
+    pageSize: body.pageSize,
+    current: body.current,
+    list,
+  })
 }

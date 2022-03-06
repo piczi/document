@@ -1,53 +1,82 @@
+import Image from 'next/image';
+import type { ImageLoaderProps } from 'next/image';
 import type { NextPage } from 'next';
 import moment from 'moment';
 import { Table } from 'antd';
 import request from '@/services';
-import { useMount } from 'react-use';
+import { useMount, useSetState } from 'react-use';
 
 import { useRequest } from '@/utils/hooks';
 import styles from './index.module.css';
 
-const { sayHello, getUserinfo } = request;
+const { getJuejinList } = request;
+
+const myLoader = ({ src, width, quality }: ImageLoaderProps) => {
+  return `${src}?w=${width}&q=${quality || 75}`
+}
 
 const Home: NextPage = () => {
 
+  const [state, setState] = useSetState({
+    current: 1,
+    pageSize: 20,
+  });
+
   const {
     data = {
-      list: [],
-      total: 0,
-      current: 1,
-      pageSize: 10,
+      data: [],
+      count: 0,
     },
     searchParams,
     loading,
     triggerRequest,
-  } = useRequest(sayHello);
+  } = useRequest(getJuejinList);
 
   useMount(() => {
     triggerRequest({
-      current: 1,
-      pageSize: 50,
-    });
-    getUserinfo().then((res: Record<string, any>) => {
-      console.log('用户信息：', res);
+      aid: 2608,
+      uuid: 7040058895097021983,
+      category_id: '',
+      cursor: 0,
+      limit: state.pageSize
     });
   });
 
   const columns = [
     {
-      title: '作业名称',
-      dataIndex: 'jobName',
+      title: '分类',
+      dataIndex: 'job_title',
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      render: (value: number) => moment(value).format('YYYY-MM-DD HH:mm:ss')
+      title: '描述',
+      dataIndex: 'description',
+      ellipsis: true,
+    },
+    {
+      title: '作者',
+      dataIndex: 'user_name',
+    },
+    {
+      title: '公司',
+      dataIndex: 'company',
+    },
+    {
+      title: '缩略图',
+      dataIndex: 'avatar_large',
+      render(src: string) {
+        return <Image
+          loader={myLoader}
+          src={src} alt="缩略图" height={40} width={40} />
+      }
     },
   ];
 
   const onPageSizeChange = (num: number, size: number) => {
     triggerRequest({
       ...searchParams,
+      limit: num * size,
+    });
+    setState({
       current: num,
       pageSize: size,
     });
@@ -58,18 +87,18 @@ const Home: NextPage = () => {
       <Table
         loading={loading}
         size="small"
-        rowKey="id"
+        rowKey="user_id"
         scroll={{
           y: 'calc(100vh - 160px)'
         }}
         pagination={{
           size: 'default',
-          total: data.total,
-          current: data.current,
-          pageSize: data.pageSize,
+          total: data.count,
+          current: state.current,
+          pageSize: state.pageSize,
           onChange: onPageSizeChange,
         }}
-        dataSource={data.list}
+        dataSource={data.data}
         columns={columns} />
     </div>
   )
