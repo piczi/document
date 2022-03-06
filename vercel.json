@@ -1,0 +1,17 @@
+{
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Origin Control",
+                    "value": "off"
+                },
+                {
+                    "key": "s-maxage",
+                    "value": "0"
+                }
+            ]
+        }
+    ]
+}
